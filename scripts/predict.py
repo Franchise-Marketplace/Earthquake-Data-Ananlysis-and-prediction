@@ -57,6 +57,7 @@ def make_prediction():
 
     # Create DataFrame
     prediction_df = pd.DataFrame(prediction_results)
+    prediction_df.to_csv(os.path.join(script_dir, "../data/prediction/earthquake_prediction.csv"))
 
     # Plot 1: Latitude and Longitude of the most frequent earthquakes
     most_frequent = prediction_df.groupby(['Latitude', 'Longitude']).size().reset_index(name='Frequency')
