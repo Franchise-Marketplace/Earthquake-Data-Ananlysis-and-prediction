@@ -48,7 +48,7 @@ def index():
     # Return the HTML page with data
     return render_template('index.html', 
                            plot_img_1=url_for('serve_images', filename='frequent_locations.png'),  # Correct file path
-                           plot_img_2=url_for('serve_images', filename='top_places_magnitude_vs_frequency.png'),  # Correct file path
+                           plot_img_2=url_for('serve_images', filename='top_places_frequency_vs_magnitude.png'),  # Correct file path
                            data=data_subset, page=page, total_pages=total_pages)
 
 # Route to download the CSV file

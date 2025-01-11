@@ -3,17 +3,23 @@ import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
 from geopy.geocoders import Nominatim
+import time
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Function for reverse geocoding to get location name based on latitude and longitude
-def get_location_name(latitude, longitude, geolocator):
-    try:
-        location = geolocator.reverse((latitude, longitude), language='en')
-        return location.address if location else "Unknown Location"
-    except Exception as e:
-        print(f"Error in reverse geocoding: {e}")
-        return "Unknown Location"
+def get_location_name(latitude, longitude, geolocator, retries=3, timeout=10):
+    for attempt in range(retries):
+        try:
+            location = geolocator.reverse((latitude, longitude), language='en', timeout=timeout)
+            return location.address if location else "Unknown Location"
+        except GeocoderTimedOut:
+            print(f"Timeout error, retrying... (Attempt {attempt+1}/{retries})")
+            time.sleep(5)  # Wait before retrying
+        except Exception as e:
+            print(f"Error in reverse geocoding: {e}")
+            break
+    return "Unknown Location"
 
 def make_prediction():
     # File paths
@@ -45,19 +51,28 @@ def make_prediction():
     for i, (lat, lon, depth, pred) in enumerate(zip(new_sample_data['latitude'], new_sample_data['longitude'], new_sample_data['depth'], predictions)):
         location_name = get_location_name(lat, lon, geolocator)
 
-        prediction_results.append({
-            'Location': location_name,
-            'Latitude': lat,
-            'Longitude': lon,
-            'Depth': depth,
-            'Predicted Magnitude': pred
-        })
-        print(f'Sample {i+1}: {location_name} magnitude: {pred}   {lat} {lon}')
+        # Only add to results if location is not "Unknown Location"
+        if location_name != "Unknown Location":
+            prediction_results.append({
+                'Location': location_name,
+                'Latitude': lat,
+                'Longitude': lon,
+                'Depth': depth,
+                'Predicted Magnitude': pred
+            })
+            print(f'Sample {i+1}: {location_name} magnitude: {pred}   {lat} {lon}')
+        else:
+            print(f'Sample {i+1}: Location is unknown, skipping...')
 
-
-    # Create DataFrame
+    # Create DataFrame with valid data
     prediction_df = pd.DataFrame(prediction_results)
-    prediction_df.to_csv(os.path.join(script_dir, "../data/prediction/earthquake_prediction.csv"))
+
+    # If there are any valid predictions, save them
+    if not prediction_df.empty:
+        prediction_df.to_csv(os.path.join(script_dir, "../data/prediction/earthquake_prediction.csv"))
+        print(f"Predictions saved to: {os.path.join(script_dir, '../data/prediction/earthquake_prediction.csv')}")
+    else:
+        print("No valid predictions to save.")
 
     # Plot 1: Latitude and Longitude of the most frequent earthquakes
     most_frequent = prediction_df.groupby(['Latitude', 'Longitude']).size().reset_index(name='Frequency')
