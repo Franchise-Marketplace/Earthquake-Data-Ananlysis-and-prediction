@@ -4,134 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Earthquake Prediction</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            text-align: center;
-        }
-        .plot {
-            margin-top: 20px;
-        }
-        .table-container {
-            margin-top: 40px;
-            border: 1px solid #ddd;
-            padding: 20px;
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 8px 12px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .pagination {
-            margin-top: 20px;
-        }
-        .pagination a {
-            margin: 0 5px;
-            padding: 8px 12px;
-            text-decoration: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
-        }
-        .pagination a:hover {
-            background-color: #0056b3;
-        }
-        .button-container {
-            margin-top: 20px;
-        }
-        .update-btn {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .update-btn:hover {
-            background-color: #218838;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Earthquake Prediction and Analysis</h1>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200 font-sans">
+    <div class="container mx-auto px-4 py-10">
+        <h1 class="text-5xl font-extrabold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-blue-500">
+            Earthquake Prediction and Analysis
+        </h1>
 
-        <h3>Data Overview</h3>
-        <p>This project predicts earthquake magnitudes using machine learning and visualizes them geographically. Below are the predictions and the geographical distribution.</p>
+        <section class="bg-gray-800 bg-opacity-50 rounded-lg p-6 mb-12 shadow-lg">
+            <h2 class="text-3xl font-semibold mb-4 text-center">Data Overview</h2>
+            <p class="text-center text-gray-300">This project predicts earthquake magnitudes using machine learning and visualizes them geographically. Below are the predictions and the geographical distribution.</p>
+        </section>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6 shadow-lg">
+                <h3 class="text-xl font-semibold mb-4 text-center">Predicted Earthquake Magnitudes</h3>
+                <img src="{{plot_img_1}}" alt="Predicted Magnitudes Plot" class="w-full rounded-md shadow-md">
+            </div>
 
-        <div class="plot">
-            <h3>Predicted Earthquake Magnitudes</h3>
-            <img src="{{plot_img_1}}" alt="Predicted Magnitudes Plot">
+            <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6 shadow-lg">
+                <h3 class="text-xl font-semibold mb-4 text-center">Magnitude Distribution</h3>
+                <img src="{{plot_img_2}}" alt="Magnitude Distribution Plot" class="w-full rounded-md shadow-md">
+            </div>
         </div>
 
- 
-        <div class="plot">
-            <h3>Magnitude Distribution</h3>
-            <img src="{{ plot_img_2 }}" alt="Magnitude Distribution Plot">
-        </div>
-
-
-        <div class="table-container">
-            <h3>Prediction Data</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Location</th>
-                        <th>Latitude</th>
-                        <th>Longitude</th>
-                        <th>Depth</th>
-                        <th>Predicted Magnitude</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in data.iterrows() %}
-                        <tr>
-                            <td>{{ row[1]['Location'] }}</td>
-                            <td>{{ row[1]['Latitude'] }}</td>
-                            <td>{{ row[1]['Longitude'] }}</td>
-                            <td>{{ row[1]['Depth'] }}</td>
-                            <td>{{ row[1]['Predicted Magnitude'] }}</td>
+        <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6 shadow-lg mb-12">
+            <h3 class="text-3xl font-semibold text-center mb-6">Prediction Data</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border border-gray-700 text-sm">
+                    <thead>
+                        <tr class="bg-gray-700">
+                            <th class="px-4 py-2 text-left">Location</th>
+                            <th class="px-4 py-2 text-left">Latitude</th>
+                            <th class="px-4 py-2 text-left">Longitude</th>
+                            <th class="px-4 py-2 text-left">Depth</th>
+                            <th class="px-4 py-2 text-left">Predicted Magnitude</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for row in data.iterrows() %}
+                        <tr class="border-t border-gray-700 hover:bg-gray-800">
+                            <td class="px-4 py-2">{{ row[1]['Location'] }}</td>
+                            <td class="px-4 py-2">{{ row[1]['Latitude'] }}</td>
+                            <td class="px-4 py-2">{{ row[1]['Longitude'] }}</td>
+                            <td class="px-4 py-2">{{ row[1]['Depth'] }}</td>
+                            <td class="px-4 py-2">{{ row[1]['Predicted Magnitude'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-
-            <div class="pagination">
+            <div class="flex justify-center mt-6 space-x-4">
                 {% if page > 1 %}
-                    <a href="{{ url_for('index', page=page-1) }}">Previous</a>
+                <a href="{{ url_for('index', page=page-1) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow-md hover:bg-blue-600">Previous</a>
                 {% endif %}
                 {% if page < total_pages %}
-                    <a href="{{ url_for('index', page=page+1) }}">Next</a>
+                <a href="{{ url_for('index', page=page+1) }}" class="px-4 py-2 bg-blue-500 text-white rounded shadow-md hover:bg-blue-600">Next</a>
                 {% endif %}
             </div>
         </div>
 
-
-        <div class="button-container">
+        <div class="text-center mb-12">
             <form action="{{ url_for('update_data') }}" method="POST">
-                <button type="submit" class="update-btn">Update Data</button>
+                <button type="submit" class="px-6 py-3 bg-green-500 text-white font-bold rounded shadow-md hover:bg-green-600">Update Data</button>
             </form>
         </div>
 
-
-        <div>
-            <h3>Download the Processed Data (CSV)</h3>
-            <a href="{{ url_for('download_csv') }}">Download CSV</a>
+        <div class="text-center">
+            <h3 class="text-xl font-semibold mb-4">Download the Processed Data (CSV)</h3>
+            <a href="{{ url_for('download_csv') }}" class="px-6 py-3 bg-purple-500 text-white font-bold rounded shadow-md hover:bg-purple-600">Download CSV</a>
         </div>
     </div>
 </body>
